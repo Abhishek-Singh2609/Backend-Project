@@ -6,7 +6,7 @@ import { ApiResponse } from "../utils/ApiResponse.js";
 
 
 const registerUser = asyncHandler(async (req, res) => {
-  // console.log('Request body:', req.body); // For debugging
+//   console.log('Request body:', req.body); // For debugging
   // res.status(200).json({
   //     message:"Finally error solved"
   // })
@@ -21,48 +21,52 @@ const registerUser = asyncHandler(async (req, res) => {
   // remove password and refresh token field from response
   // check for user creation
   // return res
-  const {fullname,email , username,password} = req.body;
-  console.log("Eamil :", email);
-  console.log("passcode :",password);
+  const {fullName,email , username,password} = req.body;
+//   console.log(req.body);
+//   console.log("Eamil :", email);
+//   console.log("passcode :",password);
 // We can check using if else for whole  validation- not empty 
-// if (fullname ==="") {
-// throw new ApiError(400,"fullname is required")
+// if (fullName ==="") {
+// throw new ApiError(400,"fullName is required")
     
 // }
 
 if (
-    [fullname,email, username,password].some((fields)=>
+    [fullName,email, username,password].some((fields)=>
     fields?.trim()==="")
 ) {
     throw new ApiError(400,"All fields are rquired")
 }
-const existedUser = User.findOne({
+const existedUser = await  User.findOne({
     $or:[{username},{email} ]
     
 });
-console.log(existedUser);
+console.log("existedUser :",existedUser);
 
 if (existedUser) {
     throw new ApiError(409,"User with given eamil or username is already exist")
 }
-const avatarLocapath = req.files?.avatar[0]?.path;
-console.log(avatarLocapath);
-const coverImageLocalPath = req.files?.coverImage[0]?.path;
-console.log(coverImageLocalPath);
-
-if (!avatarLocapath) {
+// console.log(req.files);
+// add checks to ensure req.files.avatar is defined before trying to access their properties.
+if (!req.files?.avatar || !req.files.avatar[0]) {
     throw new ApiError(400, "Avatar is required")
-    
 }
-if (!coverImageLocalPath) {
-    throw new ApiError(400, "Please upload coverImage")
-    
-}
+const avatarLocapath = req.files?.avatar[0]?.path;
+// console.log("avatarlocalPath :",avatarLocapath);
+const coverImageLocalPath = req.files?.coverImage[0]?.path;
+// console.log("coverImagelocalPath :",coverImageLocalPath);
+
+// anoter way to check coverImage is available or not in this way we can also check for avatar
+// let coverImageLocalPath;
+// if (req.files && Array.isArray(req.files.coverImage) && req.files.coverImage.length > 0) {
+//     coverImageLocalPath = req.files.coverImage[0].path
+// }
+
 const avatar= await uploadOnCloudinary(avatarLocapath)
-console.log(avatar);
+// console.log(avatar);
 
 const coverImage =await uploadOnCloudinary(coverImageLocalPath)
-console.log(coverImage);
+// console.log(coverImage);
 
 // here we again check avatar is uploaded on cloudianry or not because it's required field 
 if (!avatar) {
@@ -70,7 +74,7 @@ if (!avatar) {
 }
 
 const savedUser = await User.create({
-    fullname,
+    fullName,
     // We already check and confirm avatar is uploaded because it's a required field
     avatar :avatar.url,
     //here we are not sure coverImage is available or not thats why we check here if available then save it in database
@@ -79,7 +83,7 @@ const savedUser = await User.create({
     password,
     username: username.toLowerCase()
 })
-console.log(savedUser);
+console.log("savedUser:",savedUser);
 
 // Here we check or confirm user i.e.,savedUser is created or not in database
 const createdUser = await User.findById(savedUser._id).select(
