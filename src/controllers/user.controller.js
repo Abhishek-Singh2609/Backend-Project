@@ -33,7 +33,7 @@ const registerUser = asyncHandler(async (req, res) => {
 
 if (
     [fullName,email, username,password].some((fields)=>
-    fields?.trim()==="")
+   !fields|| fields?.trim()==="")
 ) {
     throw new ApiError(400,"All fields are rquired")
 }
@@ -53,17 +53,17 @@ if (!req.files?.avatar || !req.files.avatar[0]) {
 }
 const avatarLocapath = req.files?.avatar[0]?.path;
 // console.log("avatarlocalPath :",avatarLocapath);
-const coverImageLocalPath = req.files?.coverImage[0]?.path;
+// const coverImageLocalPath = req.files?.coverImage[0]?.path;
 // console.log("coverImagelocalPath :",coverImageLocalPath);
 
 // anoter way to check coverImage is available or not in this way we can also check for avatar
-// let coverImageLocalPath;
-// if (req.files && Array.isArray(req.files.coverImage) && req.files.coverImage.length > 0) {
-//     coverImageLocalPath = req.files.coverImage[0].path
-// }
+let coverImageLocalPath;
+if (req.files && Array.isArray(req.files.coverImage) && req.files.coverImage.length > 0) {
+    coverImageLocalPath = req.files.coverImage[0].path
+}
 
 const avatar= await uploadOnCloudinary(avatarLocapath)
-// console.log(avatar);
+console.log(avatar);
 
 const coverImage =await uploadOnCloudinary(coverImageLocalPath)
 // console.log(coverImage);
@@ -99,4 +99,5 @@ return res.status(201).json(
 )
 
 });
+
 export { registerUser };
