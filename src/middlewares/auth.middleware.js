@@ -21,7 +21,7 @@ export const verifyJWT = asyncHandler(async(req, _, next) => {
             
             throw new ApiError(401, "Invalid Access Token")
         }
-    
+   //This is a new property being added to the req object. By setting req.user, you store the user information in the request object.  
         req.user = user;
         next()
     } catch (error) {
