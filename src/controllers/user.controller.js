@@ -314,9 +314,21 @@ const updateUserAvatar = asyncHandler(async (req, res) => {
   if (!avatarLocalPath) {
     throw new ApiError(400, "Avatar file is missing");
   }
+  // Retrieve the current user document
+  const deleteOldImageOfUser = await User.findById(req.user._id);
 
-  
+  // Extract the public ID from the current avatar URL if it exists
+  const currentAvatarUrl = deleteOldImageOfUser.avatar;
+  if (currentAvatarUrl) {
+    const currentAvatarPublicId = currentAvatarUrl
+      .split("/")
+      .pop()
+      .split(".")[0];
 
+    // Delete the old image from Cloudinary
+    await deleteFromCloudinary(currentAvatarPublicId);
+  }
+  // Upload the new avatar to Cloudinary
   const avatar = await uploadOnCloudinary(avatarLocalPath);
 
   if (!avatar.url) {
@@ -345,6 +357,21 @@ const updateUserCoverImage = asyncHandler(async (req, res) => {
     throw new ApiError(400, "Cover image file is missing");
   }
 
+  // Retrieve the current user document
+  const deleteOldImageOfUser = await User.findById(req.user._id);
+
+  // Extract the public ID from the current avatar URL if it exists
+  const currentAvatarUrl = deleteOldImageOfUser.avatar;
+  if (currentAvatarUrl) {
+    const currentAvatarPublicId = currentAvatarUrl
+      .split("/")
+      .pop()
+      .split(".")[0];
+
+    // Delete the old image from Cloudinary
+    await deleteFromCloudinary(currentAvatarPublicId);
+  }
+  // Upload the new avatar to Cloudinary
   const coverImage = await uploadOnCloudinary(coverImageLocalPath);
 
   if (!coverImage.url) {
