@@ -29,5 +29,6 @@ import dashboardRouter from "./routes/dashboard.routes.js";
 
 // Router declaration
 app.use("/api/v1/users", userRouter);
+app.use("/api/v1/healthcheck", healthcheckRouter);
 
 export { app };
