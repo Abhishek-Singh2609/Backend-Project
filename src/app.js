@@ -34,5 +34,6 @@ app.use("/api/v1/tweets", tweetRouter);
 import subscriptionRouter from "./routes/subscription.routes.js";
 import videoRouter from "./routes/video.routes.js";
 app.use("/api/v1/comments", commentRouter);
+app.use("/api/v1/likes", likeRouter);
 
 export { app };
